@@ -12,6 +12,8 @@ Currently supports at least these models
 * Mitsubishi MSZ FD-25, probably also FD-35 (remote control P/N KM09D 0052376)
 * Hisense AUD (remote control Y-H1-01,  Y-H1-02(E), Y-J1, Y-E4-07) probably AUC model
 
+Note: This is a modified version to work with the ESP8266, and more specifically, the Adafruit Huzzah ESP8266
+
 
 Instructions
 ------------

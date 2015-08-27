@@ -18,6 +18,7 @@ class IRSender
 
   private:
     byte _pin;
+    int halfPeriodicTime;
 };
 
 #endif

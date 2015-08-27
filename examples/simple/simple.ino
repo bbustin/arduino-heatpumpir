@@ -6,7 +6,7 @@
 #include <MitsubishiHeatpumpIR.h>
 #include <SamsungHeatpumpIR.h>
 
-IRSender irSender(3); // IR led on Duemilanove digital pin 3
+IRSender irSender(2); // IR led on ESP8266
 
 // Array with all supported heatpumps
 HeatpumpIR *heatpumpIR[] = {new PanasonicCKPHeatpumpIR(), new PanasonicDKEHeatpumpIR(), new PanasonicJKEHeatpumpIR(),

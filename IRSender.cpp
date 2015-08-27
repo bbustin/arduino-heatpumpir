@@ -5,6 +5,8 @@
 // https://github.com/shirriff/Arduino-IRremote
 //
 // For PWM on Arduino, see http://playground.arduino.cc/Main/TimerPWMCheatsheet
+//
+// For ESP8266, see https://github.com/markszabo/IRremoteESP8266/
 
 IRSender::IRSender(byte pin)
 {
@@ -19,6 +21,7 @@ void IRSender::setFrequency(int frequency)
 
   pinMode(_pin, OUTPUT);
   digitalWrite(_pin, LOW); // When not sending PWM, we want it low
+  halfPeriodicTime = 500/frequency;
 
   switch (_pin)
   {
@@ -49,6 +52,9 @@ void IRSender::setFrequency(int frequency)
       TCCR5B = _BV(WGM53) | _BV(CS50);
       ICR5 = pwmval16;
       OCR5A = pwmval16 / 3;
+#elif defined(ESP8266)
+      default:
+        break;
 #else
 // Arduino Duemilanove etc
     case 3:
@@ -108,9 +114,9 @@ byte IRSender::bitReverse(byte x)
 // Send an IR 'mark' symbol, i.e. transmitter ON
 void IRSender::mark(int markLength)
 {
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
   switch (_pin)
   {
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 // Arduino Mega
     case 9:
       (TCCR2A |= _BV(COM2B1)); // Enable pin 3 PWM output
@@ -133,8 +139,18 @@ void IRSender::mark(int markLength)
     case 46:
       (TCCR5A |= _BV(COM5A1)); // Enable pin 46 PWM output on Arduino Mega
       break;
+#elif defined(ESP8266)
+      long beginning = micros();
+      while(micros() - beginning < markLength){
+          digitalWrite(_pin, HIGH);
+          delayMicroseconds(halfPeriodicTime);
+          digitalWrite(_pin, LOW);
+          delayMicroseconds(halfPeriodicTime);
+      }
 #else
-// Arduino Duemilanove etc
+  // Arduino Duemilanove etc
+  switch (_pin)
+  {
     case 3:
       (TCCR2A |= _BV(COM2B1)); // Enable pin 3 PWM output
       break;
@@ -147,10 +163,10 @@ void IRSender::mark(int markLength)
     case 11:
       (TCCR2A |= _BV(COM2A1)); // Enable pin 11 PWM output
       break;
-#endif
     }
+    delayMicroseconds(markLength);
+#endif
 
-  delayMicroseconds(markLength);
 }
 
 // Send an IR 'space' symbol, i.e. transmitter OFF
@@ -178,6 +194,10 @@ void IRSender::space(int spaceLength)
       (TCCR5A &= ~(_BV(COM5B1))); // Disable pin 45 PWM output on Arduino Mega
     case 46:
       (TCCR5A &= ~(_BV(COM5A1))); // Disable pin 46 PWM output on Arduino Mega
+#elif defined(ESP8266)
+      default:
+        digitalWrite(_pin, LOW);
+        break;
 #else
 // Arduino Duemilanove etc
     case 3:

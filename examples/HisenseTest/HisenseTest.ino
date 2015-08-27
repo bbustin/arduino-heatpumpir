@@ -1,6 +1,6 @@
 #include <HisenseHeatpumpIR.h>
 
-IRSender irSender(3); // IR led on Duemilanove digital pin 3
+IRSender irSender(2); // IR led on ESP8266
 
 HisenseHeatpumpIR *heatpumpIR;                        
 
